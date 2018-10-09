@@ -1,0 +1,64 @@
+{
+  "name": "Twilio Delivery Preference",
+
+  "namespace":"Stanford\\DeliveryPreference",
+
+  "description": "Twilio Delivery Preference",
+
+  "authors": [
+    {
+      "name": "Andrew Martin",
+      "email": "andy123@stanford.edu",
+      "institution": "Stanford University"
+    },
+    {
+      "name": "Irvin Szeto",
+      "email": "irvins@stanford.edu",
+      "institution": "Stanford University"
+    }
+  ],
+
+  "permissions": [
+    "redcap_save_record"
+  ],
+
+  "links": {
+    "project": [
+      {
+        "name": "Twilio Delivery Preference",
+        "icon": "gear",
+        "url" : "action.php"
+      }
+    ]
+  },
+
+  "system-settings": [
+    {
+      "key": "enable-system-debug-logging",
+      "name": "<b>Enable Debug Logging (system-wide)</b>",
+      "required": false,
+      "type": "checkbox"
+    }
+  ],
+
+  "project-settings": [
+    {
+      "key": "watch-instrument",
+      "name": "<b>Instrument Name:</b> Select Instrument",
+      "required": true,
+      "type": "form-list"
+    },
+    {
+      "key": "sms-logic",
+      "name": "<b>Enter logic for SMS</b> (e.g. <code>[txt_email_quest] = 2</code>)",
+      "required": true,
+      "type": "textarea"
+    },
+    {
+      "key": "enable-project-debug-logging",
+      "name": "<b>Enable Debug Logging</b>",
+      "required": false,
+      "type": "checkbox"
+    }
+  ]
+}
