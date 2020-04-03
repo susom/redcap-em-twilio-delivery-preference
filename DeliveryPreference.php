@@ -40,8 +40,24 @@ class DeliveryPreference extends \ExternalModules\AbstractExternalModule
             // Get first survey_id
             $first_survey_id = $Proj->firstFormSurveyId;
 
+            if (empty($first_survey_id)) {
+                $first_survey_id = array_key_first($Proj->surveys);
+            }
+
+            if (empty($first_survey_id)) {
+                $this->emDebug("Unable to identify first_survey_id");
+                return;
+            }
+
             // Get a valid participant_id
+            $this->emDebug($first_survey_id, $record, $first_event_id);
             list ($participant_id, $hash) = Survey::getFollowupSurveyParticipantIdHash($first_survey_id, $record, $first_event_id);
+            $this->emDebug($participant_id,$hash);
+
+            if (empty($participant_id)) {
+                $this->emDebug("Unable to find first participant id");
+                return;
+            }
 
             $this->emDebug("Participant is $participant_id for event $first_event_id and survey $first_survey_id", "DEBUG");
 
