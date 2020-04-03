@@ -23,13 +23,6 @@
   ],
 
   "links": {
-    "project": [
-      {
-        "name": "Twilio Delivery Preference",
-        "icon": "gear",
-        "url" : "action.php"
-      }
-    ]
   },
 
   "system-settings": [
@@ -43,16 +36,16 @@
 
   "project-settings": [
     {
-      "key": "watch-instrument",
-      "name": "<b>Instrument Name:</b> Select Instrument",
-      "required": true,
-      "type": "form-list"
-    },
-    {
       "key": "sms-logic",
-      "name": "<b>Enter logic for SMS</b> (e.g. <code>[txt_email_quest] = 2</code>)",
+      "name": "<b>Enter logic for SMS</b> (e.g. <code>[txt_email_quest] = 2</code>)<br>If this is true, SMS delivery will be used.  If false, then Email delivery",
       "required": true,
       "type": "textarea"
+    },
+    {
+      "key": "watch-instrument",
+      "name": "<b>Eval on Save Of</b><br>After this instrument is saved, the logic above will be evaluated and the delivery preference will be updated",
+      "required": true,
+      "type": "form-list"
     },
     {
       "key": "enable-project-debug-logging",

@@ -7,7 +7,6 @@ require_once "emLoggerTrait.php";
 use ExternalModules\ExternalModules;
 use REDCap;
 use Survey;
-use Message;
 
 
 class DeliveryPreference extends \ExternalModules\AbstractExternalModule
@@ -18,17 +17,18 @@ class DeliveryPreference extends \ExternalModules\AbstractExternalModule
      * This is the cron task specified in the config.json
      */
     function redcap_save_record($project_id, $record = NULL, $instrument, $event_id, $group_id = NULL, $survey_hash = NULL, $response_id = NULL, $repeat_instance = 1){
-        if( $instrument == $this->getProjectSetting("watch-instrument") ){
+        $watch = $this->getProjectSetting("watch-instrument");
 
-            $this->emDebug("In Instrument " . $instrument);
+        if(empty($watch) || $watch) {
 
+            // Evaluate Logic
             $logic = $this->getProjectSetting("sms-logic");
-            if(REDCap::evaluateLogic($logic, $project_id, $record, $event_id , $repeat_instance)){
-                $delivery_preference = 'SMS_INVITE_WEB';
-            }else{
-                $delivery_preference = 'EMAIL';
+            if (empty($logic)) {
+                $this->emDebug("No logic specified - skipping");
+                return;
             }
 
+            $delivery_preference = REDCap::evaluateLogic($logic, $project_id, $record, $event_id , $repeat_instance) ? "SMS_INVITE_WEB" : "EMAIL";
             $this->emDebug("Delivery Preference set to " . $delivery_preference);
 
             // Get first survey_id
@@ -46,14 +46,15 @@ class DeliveryPreference extends \ExternalModules\AbstractExternalModule
             $this->emDebug("Participant is $participant_id for event $first_event_id and survey $first_survey_id", "DEBUG");
 
             // Set this preference on all events/surveys for this record
-            $sql1 = "update redcap_surveys_participants set delivery_preference = '".db_escape($delivery_preference)."'
-            where participant_id = '".db_escape($participant_id)."'";
-            $sql2 = "update redcap_surveys_participants p, redcap_surveys_response r, redcap_surveys s, redcap_surveys t,
-            redcap_surveys_participants a, redcap_surveys_response b
-            set a.delivery_preference = '".db_escape($delivery_preference)."'
-            where p.participant_id = '".db_escape($participant_id)."' and r.participant_id = p.participant_id
-            and s.survey_id = p.survey_id and s.project_id = t.project_id and t.survey_id = a.survey_id
-            and a.participant_id = b.participant_id and b.record = r.record";
+            $sql1 = "update redcap_surveys_participants set delivery_preference = '".db_escape($delivery_preference)."'" .
+                " where participant_id = '".db_escape($participant_id)."'";
+
+            $sql2 = "update redcap_surveys_participants p, redcap_surveys_response r, redcap_surveys s, redcap_surveys t," .
+                " redcap_surveys_participants a, redcap_surveys_response b" .
+                " set a.delivery_preference = '".db_escape($delivery_preference)."'" .
+            " where p.participant_id = '".db_escape($participant_id)."' and r.participant_id = p.participant_id " .
+            " and s.survey_id = p.survey_id and s.project_id = t.project_id and t.survey_id = a.survey_id " .
+            " and a.participant_id = b.participant_id and b.record = r.record";
             //        Plugin::log($sql1, "DEBUG", "sql1");
             //        Plugin::log($sql2, "DEBUG", "sql2");
             if (db_query($sql1) && db_query($sql2)) {
@@ -62,7 +63,7 @@ class DeliveryPreference extends \ExternalModules\AbstractExternalModule
                 // Return html for delivery preference icon
                 $this->emDebug("Updated survey preference for $record to $delivery_preference");
             } else {
-                $this->emDebug("Error updating survey preference for $record to $delivery_preference from $instrument");
+                $this->emDebug("Error updating survey preference for $record to $delivery_preference from $instrument", $sql1, $sql1);
             }
         }
     }
