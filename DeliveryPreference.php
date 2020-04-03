@@ -41,7 +41,11 @@ class DeliveryPreference extends \ExternalModules\AbstractExternalModule
             $first_survey_id = $Proj->firstFormSurveyId;
 
             if (empty($first_survey_id)) {
-                $first_survey_id = array_key_first($Proj->surveys);
+                $Proj->loadSurveys();
+                $surveys = $Proj->surveys;
+                if (!empty($surveys)) {
+                    $first_survey_id = key($surveys);
+                }
             }
 
             if (empty($first_survey_id)) {
